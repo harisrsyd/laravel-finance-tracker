@@ -1,0 +1,137 @@
+## 🧩 ERD — Finance Tracker & Budgeting (Laravel + Filament)
+
+You can see detail of the Entity Relation Diagran in [MermaidChart.com Playground](https://www.mermaidchart.com/play) or other diagram tools. If you using Mermaid Chart you can open .mmd file below to the code to generate diagram:
+
+-   [ERD V.1.0.0 (first design)]()
+
+### Diagram Visualisation
+
+![Diagram v.1.0.0](./MermaidChart-LaravelFinanceTracker-v1.svg)
+
+### Entity Relation
+
+```
+erDiagram
+    USERS ||--o{ ACCOUNTS : owns
+    USERS ||--o{ TRANSACTIONS : records
+    USERS ||--o{ BUDGETS : defines
+    USERS ||--o{ CATEGORIES : creates
+    ACCOUNTS ||--o{ TRANSACTIONS : contains
+    BUDGETS ||--o{ BUDGET_ITEMS : has
+    TRANSACTIONS }o--|| CATEGORIES : categorized_as
+    TRANSACTIONS ||--o{ ATTACHMENTS : has
+    USERS ||--o{ RECURRING_TRANSACTIONS : schedules
+    CURRENCIES ||--o{ ACCOUNTS : used_by
+    CURRENCIES ||--o{ TRANSACTIONS : recorded_in
+```
+
+### Main Database Table
+
+```
+    USERS {
+      uuid id PK
+      string name
+      string email UNIQUE
+      string password
+      timestamp email_verified_at NULL
+      timestamp created_at
+      timestamp updated_at
+      timestamp deleted_at NULL
+    }
+
+    ACCOUNTS {
+      uuid id PK
+      uuid user_id FK
+      string name
+      decimal balance
+      string type
+      string currency_code FK
+      boolean is_archived DEFAULT false
+      timestamp created_at
+      timestamp updated_at
+      timestamp deleted_at NULL
+    }
+
+    TRANSACTIONS {
+      uuid id PK
+      uuid user_id FK
+      uuid account_id FK
+      decimal amount
+      string type "INCOME/EXPENSE/TRANSFER"
+      uuid category_id FK
+      text note NULL
+      date occurred_at
+      string currency_code FK
+      uuid transfer_to_account_id FK NULL
+      timestamp created_at
+      timestamp updated_at
+      timestamp deleted_at NULL
+    }
+
+    CATEGORIES {
+      uuid id PK
+      uuid user_id FK
+      string name
+      string kind "income/expense"
+      string color NULL
+      timestamp created_at
+      timestamp updated_at
+      timestamp deleted_at NULL
+    }
+
+    BUDGETS {
+      uuid id PK
+      uuid user_id FK
+      string name
+      decimal limit_amount
+      string period "monthly/weekly/yearly/custom"
+      date period_start
+      date period_end
+      boolean is_active DEFAULT true
+      timestamp created_at
+      timestamp updated_at
+      timestamp deleted_at NULL
+    }
+
+    BUDGET_ITEMS {
+      uuid id PK
+      uuid budget_id FK
+      uuid category_id FK
+      decimal allocated_amount
+      timestamp created_at
+      timestamp updated_at
+      timestamp deleted_at NULL
+    }
+
+    RECURRING_TRANSACTIONS {
+      uuid id PK
+      uuid user_id FK
+      uuid account_id FK
+      decimal amount
+      string recurrence_rule "e.g. monthly, weekly"
+      string type
+      uuid category_id FK
+      date next_run_at
+      boolean is_active DEFAULT true
+      timestamp created_at
+      timestamp updated_at
+      timestamp deleted_at NULL
+    }
+
+    ATTACHMENTS {
+      uuid id PK
+      uuid transaction_id FK
+      string file_path
+      string mime_type
+      integer file_size
+      timestamp created_at
+      timestamp updated_at
+      timestamp deleted_at NULL
+    }
+
+    CURRENCIES {
+      string code PK
+      string name
+      integer minor_unit
+    }
+```
